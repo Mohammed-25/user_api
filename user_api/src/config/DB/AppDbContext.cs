@@ -4,26 +4,37 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ProductAppAsync.src;
+using ProductApplication.Models;
+
 
 
 namespace ProductAppAsync.src.config.DB
 {
-    public class AppDbContext : DbContext 
+    public class AppDbContext : DbContext
     {
-        // public DbSet<User> Users { get; set; }
+        public DbSet<Users> Users { get; set; }
+        public DbSet<Profile> Profiles { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Users>(entity => 
+            modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasKey(e => e.userId);
                 entity.Property(e => e.userName).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.email).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.adreess).HasMaxLength(200);
             });
-    } 
+
+            modelBuilder.Entity<Profile>(entity =>
+            {
+                entity.HasKey(e => e.ProfileId);
+                entity.Property(e => e.ProfileName).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.age).IsRequired();
+                entity.Property(e => e.PohneNumber).IsRequired().HasMaxLength(10);
+            });
+        }
     }
 }

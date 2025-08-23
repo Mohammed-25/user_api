@@ -7,13 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ProductApplication.Models
 {
-   [ApiController]
-    [Route("api/Users")]
+    [ApiController]
+    [Route("api/[[Users]]")]
     public class UserController : ControllerBase
     {
-        private readonly UsersServices _userServices;
-
-        public UserController(UsersServices userServices)
+        private readonly IUserService _userServices;
+        public UserController(IUserService userServices)
         {
             _userServices = userServices;
         }
@@ -21,8 +20,19 @@ namespace ProductApplication.Models
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
-            var users = await _userService.GetAllUsersAsync();
+            var users = await _userServices.GetAllUsers();
             return Ok(users);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(int id)
+        {
+            var user = await _userServices.GetById(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
         }
 
         [HttpPost]
@@ -32,8 +42,35 @@ namespace ProductApplication.Models
             {
                 return BadRequest("User cannot be null");
             }
-            await _userService.AddUserAsync(user);
+            await _userServices.AddUser(user);
             return CreatedAtAction(nameof(GetAllUsers), new { id = user.userId }, user);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] Users updatedUser)
+        {
+            var existingUser = await _userServices.GetById(id);
+            if (existingUser == null)
+            {
+                return NotFound();
+            }
+            existingUser.userName = updatedUser.userName;
+            existingUser.email = updatedUser.email;
+            existingUser.adreess = updatedUser.adreess;
+            await _userServices.UodateUser(id, existingUser);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var existingUser = await _userServices.GetById(id);
+            if (existingUser == null)
+            {
+                return NotFound();
+            }
+            await _userServices.DeleteUser(id);
+            return NoContent();
         }
     }
 
