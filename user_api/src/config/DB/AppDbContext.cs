@@ -26,6 +26,10 @@ namespace ProductAppAsync.src.config.DB
                 entity.Property(e => e.userName).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.email).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.adreess).HasMaxLength(200);
+
+                entity.HasOne(Users => Users.Profile)
+                .WithOne(Profile => Profile.User)
+                .HasForeignKey<Profile>(Profile => Profile.UserId);
             });
 
             modelBuilder.Entity<Profile>(entity =>
@@ -34,6 +38,11 @@ namespace ProductAppAsync.src.config.DB
                 entity.Property(e => e.ProfileName).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.age).IsRequired();
                 entity.Property(e => e.PohneNumber).IsRequired().HasMaxLength(10);
+
+                entity.HasOne(Profile => Profile.User)
+                .WithOne(Users => Users.Profile)
+                .HasForeignKey<Profile>(Profile => Profile.UserId);
+
             });
         }
     }
